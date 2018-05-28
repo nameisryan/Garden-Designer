@@ -67,7 +67,7 @@ public class GardenDesign extends JFrame
         
         JLabel title = new JLabel("My Beautiful Garden", JLabel.CENTER);
         title.setFont(new Font("SansSerif", Font.BOLD, 20));
-        //window.add(title, BorderLayout.NORTH);
+        window.add(title, BorderLayout.NORTH);
         
         theGarden = new DrawingPanel(this);
         // Don't need to set the panels' preferred size: 

@@ -1,3 +1,4 @@
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -18,11 +19,13 @@ import javax.swing.*;
 
 public class GardenDesign extends JFrame
                           implements MouseListener {
-   
+	
+	/* Removed array and replaced with ArrayList object
+		This enables an "endless" amount of trees to be added
+	*/
+	
     private static final Boolean DEBUG = true;
-	private final int maxTrees = 10;
-    private Tree[] trees = new Tree[maxTrees];
-    private int treeCount = 0;
+    private ArrayList<Tree> trees = new ArrayList<Tree>();
     
     private DrawingPanel theGarden;
     
@@ -55,12 +58,12 @@ public class GardenDesign extends JFrame
     	}
     	
         setTitle("Garden designer");
-        setSize(500,500);
+        setSize(800,600);
         setLocation(200,100);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         Container window = getContentPane();
         
-        window.add(createToolBar(), BorderLayout.NORTH);
+        window.add(createToolBar(), BorderLayout.EAST);
         
         JLabel title = new JLabel("My Beautiful Garden", JLabel.CENTER);
         title.setFont(new Font("SansSerif", Font.BOLD, 20));
@@ -72,7 +75,7 @@ public class GardenDesign extends JFrame
         theGarden.setBackground(new Color(200,255,200));
         window.add(theGarden, BorderLayout.CENTER);
         
-        window.add(new JLabel("Click to add a tree (maximum "+maxTrees+")", JLabel.CENTER), BorderLayout.SOUTH);
+        window.add(new JLabel("Click to add a tree.", JLabel.CENTER), BorderLayout.SOUTH);
         
         // Register to be notified of mouse clicks on the drawing panel,
         // and nowhere else in the window. Coordinates will be relative to the panel.
@@ -91,12 +94,19 @@ public class GardenDesign extends JFrame
     	JMenu fileMenu = new JMenu("File");
     	fileMenu.setMnemonic(KeyEvent.VK_F);
     	
+    	JMenuItem menuItemNew = new JMenuItem("New");
+    	menuItemNew.setMnemonic(KeyEvent.VK_N);
+    	menuItemNew.addActionListener((ActionEvent event) -> {
+    		this.newGarden();
+    	});
+    	
     	JMenuItem menuItemExit = new JMenuItem("Exit");
     	menuItemExit.setMnemonic(KeyEvent.VK_X);
     	menuItemExit.addActionListener((ActionEvent event) -> {
     		System.exit(0);
     	});
     	
+    	fileMenu.add(menuItemNew);
     	fileMenu.add(menuItemExit);
     	menuBar.add(fileMenu);
     	
@@ -126,11 +136,16 @@ public class GardenDesign extends JFrame
     }
     
     public void paintGarden(Graphics g) {
-           
-        for (int i = 0; i < treeCount; i++) {
-            trees[i].draw(g);
+        
+        for(Tree tree:trees) {
+        	tree.draw(g);
         }
       
+    }
+    
+    public void newGarden() {
+    	this.trees = new ArrayList<Tree>();
+    	repaint();
     }
     
     
@@ -138,13 +153,11 @@ public class GardenDesign extends JFrame
     	// Moved this from mouseClicked because it 
     	// failed if the mouse moved while clicking.
     	
-    	if (treeCount < maxTrees) {
-            int x = e.getX();
-            int y = e.getY();
-            trees[treeCount] = new Tree(x, y, 2);
-            treeCount++;
-            repaint();
-        }
+        int x = e.getX();
+        int y = e.getY();
+        trees.add(new Tree(x, y));
+        repaint();
+        
     }
     
     public void mouseClicked(MouseEvent e) { }

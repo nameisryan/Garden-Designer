@@ -3,6 +3,7 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 
 /**
@@ -32,6 +33,8 @@ public class GardenDesign extends JFrame
     
     private DrawingPanel theGarden;
     
+    JFileChooser fileChooser;
+    
     /**
      * Main method which invokes the class.
      * @param args Not used.
@@ -46,6 +49,9 @@ public class GardenDesign extends JFrame
         
     }
     
+    public GardenDesign() {
+    	
+    }
     
     /**
      * Used to set up the window properties.
@@ -60,9 +66,13 @@ public class GardenDesign extends JFrame
     		System.out.println("Could not set look and feel.\nError: " + e + "\n");
     	}
     	
+    	this.fileChooser = new JFileChooser();
+    	fileChooser.setAcceptAllFileFilterUsed(false);
+    	fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Garden Design Files", "dat"));
+    	
         setTitle("Garden designer");
         setSize(800,600);
-        setLocation(200,100);
+        setLocation(300,200);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         Container window = getContentPane();
         
@@ -97,19 +107,21 @@ public class GardenDesign extends JFrame
     	JMenu fileMenu = new JMenu("File");
     	fileMenu.setMnemonic(KeyEvent.VK_F);
     	
-    	JMenuItem menuItemNew = new JMenuItem("New");
+    	JMenuItem menuItemNew = new JMenuItem("New", UIManager.getIcon("FileView.fileIcon"));
     	menuItemNew.setMnemonic(KeyEvent.VK_N);
     	menuItemNew.addActionListener((ActionEvent event) -> {
     		this.newGarden();
     	});
     	
-    	JMenuItem menuItemOpen = new JMenuItem("Open");
+    	JMenuItem menuItemOpen = new JMenuItem("Open", UIManager.getIcon("FileView.directoryIcon"));
     	menuItemOpen.setMnemonic(KeyEvent.VK_O);
     	menuItemOpen.addActionListener((ActionEvent event) -> {
     		this.openGarden();
     	});
     	
-    	JMenuItem menuItemSave = new JMenuItem("Save");
+    	//UIManager.getIcon("FileView.floppyDriveIcon")
+    	
+    	JMenuItem menuItemSave = new JMenuItem("Save", UIManager.getIcon("FileView.floppyDriveIcon"));
     	menuItemSave.setMnemonic(KeyEvent.VK_V);
     	menuItemSave.addActionListener((ActionEvent event) -> {
     		this.saveGarden();
@@ -160,6 +172,10 @@ public class GardenDesign extends JFrame
       
     }
     
+    /**
+     * Clear the current design.
+     */
+    
     public void newGarden() {
     	this.trees = new ArrayList<Tree>();
     	repaint();
@@ -170,20 +186,31 @@ public class GardenDesign extends JFrame
      */
     
     public void saveGarden() {
-    	try {
-			FileOutputStream f = new FileOutputStream(new File("garden.dat"));
-			ObjectOutputStream o = new ObjectOutputStream(f);
-	    	
-			o.writeObject(this.trees);
-			
-			o.close();
-			f.close();
-			
-    	} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-		} catch (IOException e) {
-			System.out.println("Error initializing stream");
-		}
+    	
+    	if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+    		File file = fileChooser.getSelectedFile();
+    			
+    		try {
+    			FileOutputStream f;
+    			if(file.getName().endsWith(".dat"))
+    				f = new FileOutputStream(file);
+    			else
+    				f = new FileOutputStream(file + ".dat");
+    			
+    			ObjectOutputStream o = new ObjectOutputStream(f);
+    	    	
+    			o.writeObject(this.trees);
+    			
+    			o.close();
+    			f.close();
+    			
+        	} catch (FileNotFoundException e) {
+    			System.out.println("File not found");
+    		} catch (IOException e) {
+    			System.out.println("Error initializing stream");
+    		}
+    	}
+    	
     }
     
     /**
@@ -192,24 +219,30 @@ public class GardenDesign extends JFrame
     
     public void openGarden() {
     	
-    	try {
-			FileInputStream fi = new FileInputStream(new File("garden.dat"));
-			ObjectInputStream oi = new ObjectInputStream(fi);
-			
-			this.trees = (ArrayList<Tree>) oi.readObject();
-			
-			oi.close();
-			fi.close();
-			
-    	} catch (FileNotFoundException e) {
-			System.out.println("File not found");
-		} catch (IOException e) {
-			System.out.println("Error initializing stream");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+    	if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+    		File file = fileChooser.getSelectedFile();
+    		
+    		try {
+    			FileInputStream fi = new FileInputStream(file);
+    			ObjectInputStream oi = new ObjectInputStream(fi);
+    			
+    			this.trees = (ArrayList<Tree>) oi.readObject();
+    			
+    			oi.close();
+    			fi.close();
+    			
+        	} catch (FileNotFoundException e) {
+    			System.out.println("File not found");
+    		} catch (IOException e) {
+    			System.out.println("Error initializing stream");
+    		} catch (ClassNotFoundException e) {
+    			e.printStackTrace();
+    		}
 
-    	repaint();
+        	repaint();
+    	}
+    	
+    	
     	
     }
     

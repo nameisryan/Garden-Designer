@@ -1,7 +1,10 @@
 import java.awt.*;
+import java.io.Serializable;
 
-public class Tree { 
-   
+public class Tree implements Serializable { 
+	
+	private static final long serialVersionUID = 1L;
+	
     // The coordinates of the top of the tree
     private int x, y, type;
     

@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -26,6 +27,8 @@ public class GardenDesign extends JFrame
 	
     private static final Boolean DEBUG = true;
     private ArrayList<Tree> trees = new ArrayList<Tree>();
+    
+    private JComboBox<String> selectType;
     
     private DrawingPanel theGarden;
     
@@ -100,6 +103,18 @@ public class GardenDesign extends JFrame
     		this.newGarden();
     	});
     	
+    	JMenuItem menuItemOpen = new JMenuItem("Open");
+    	menuItemOpen.setMnemonic(KeyEvent.VK_O);
+    	menuItemOpen.addActionListener((ActionEvent event) -> {
+    		this.openGarden();
+    	});
+    	
+    	JMenuItem menuItemSave = new JMenuItem("Save");
+    	menuItemSave.setMnemonic(KeyEvent.VK_V);
+    	menuItemSave.addActionListener((ActionEvent event) -> {
+    		this.saveGarden();
+    	});
+    	
     	JMenuItem menuItemExit = new JMenuItem("Exit");
     	menuItemExit.setMnemonic(KeyEvent.VK_X);
     	menuItemExit.addActionListener((ActionEvent event) -> {
@@ -107,6 +122,8 @@ public class GardenDesign extends JFrame
     	});
     	
     	fileMenu.add(menuItemNew);
+    	fileMenu.add(menuItemOpen);
+    	fileMenu.add(menuItemSave);
     	fileMenu.add(menuItemExit);
     	menuBar.add(fileMenu);
     	
@@ -117,19 +134,19 @@ public class GardenDesign extends JFrame
     
     /**
      * Used to create the toolbar.
-     * @return Instance of JToolBar.
-     * @see  javax.swing.JToolBar
+     * @return Instance of JPanel.
+     * @see  javax.swing.JPanel
      */
     
-    private JToolBar createToolBar() {
-    	JToolBar toolBar = new JToolBar();
+    private JPanel createToolBar() {
+    	JPanel toolBar = new JPanel();
     	
-    	JButton buttonSave = new JButton(UIManager.getIcon("FileView.floppyDriveIcon"));
-    	toolBar.add(buttonSave);
+    	JLabel labelType = new JLabel("Type:");
+    	String[] types = {"Standard", "Pine"};
+    	this.selectType = new JComboBox<String>(types);
+    	toolBar.add(labelType);
+    	toolBar.add(selectType);
     	
-    	buttonSave.addActionListener((ActionEvent event) -> {
-    		System.exit(0);
-    	});
     	
     	return toolBar;
     	
@@ -148,14 +165,70 @@ public class GardenDesign extends JFrame
     	repaint();
     }
     
+    /**
+     * Save the current garden.
+     */
+    
+    public void saveGarden() {
+    	try {
+			FileOutputStream f = new FileOutputStream(new File("garden.dat"));
+			ObjectOutputStream o = new ObjectOutputStream(f);
+	    	
+			o.writeObject(this.trees);
+			
+			o.close();
+			f.close();
+			
+    	} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		} catch (IOException e) {
+			System.out.println("Error initializing stream");
+		}
+    }
+    
+    /**
+     * Open a previously saved garden.
+     */
+    
+    public void openGarden() {
+    	
+    	try {
+			FileInputStream fi = new FileInputStream(new File("garden.dat"));
+			ObjectInputStream oi = new ObjectInputStream(fi);
+			
+			this.trees = (ArrayList<Tree>) oi.readObject();
+			
+			oi.close();
+			fi.close();
+			
+    	} catch (FileNotFoundException e) {
+			System.out.println("File not found");
+		} catch (IOException e) {
+			System.out.println("Error initializing stream");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
+    	repaint();
+    	
+    }
     
     public void mousePressed(MouseEvent e) {
     	// Moved this from mouseClicked because it 
     	// failed if the mouse moved while clicking.
+    	int type = 1;
     	
         int x = e.getX();
         int y = e.getY();
-        trees.add(new Tree(x, y));
+        
+        String selectedTreeType = (String) selectType.getSelectedItem();
+        
+        if(selectedTreeType == "Standard")
+        	type = 1;
+        else
+        	type = 2;
+        
+        trees.add(new Tree(x, y, type));
         repaint();
         
     }

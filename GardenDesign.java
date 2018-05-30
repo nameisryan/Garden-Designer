@@ -154,8 +154,7 @@ public class GardenDesign extends JFrame
     	JPanel toolBar = new JPanel();
     	
     	JLabel labelType = new JLabel("Type:");
-    	String[] types = {"Standard", "Pine"};
-    	this.selectType = new JComboBox<String>(types);
+    	this.selectType = new JComboBox<String>( Tree.getTypes() );
     	toolBar.add(labelType);
     	toolBar.add(selectType);
     	
@@ -249,19 +248,13 @@ public class GardenDesign extends JFrame
     public void mousePressed(MouseEvent e) {
     	// Moved this from mouseClicked because it 
     	// failed if the mouse moved while clicking.
-    	int type = 1;
     	
         int x = e.getX();
         int y = e.getY();
         
         String selectedTreeType = (String) selectType.getSelectedItem();
         
-        if(selectedTreeType == "Standard")
-        	type = 1;
-        else
-        	type = 2;
-        
-        trees.add(new Tree(x, y, type));
+        trees.add(new Tree(x, y, selectedTreeType));
         repaint();
         
     }

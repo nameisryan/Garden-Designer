@@ -15,6 +15,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  */
 
+// TODO: Toolbar stacked vertically.
+// 		 Save and load ponds.
 
 
 //http://www.cs.stir.ac.uk/~sbj/examples/Java-applications/SimpleGardenDesign/
@@ -28,8 +30,12 @@ public class GardenDesign extends JFrame
 	
     private static final Boolean DEBUG = true;
     private ArrayList<Tree> trees = new ArrayList<Tree>();
+    private ArrayList<Pond> ponds = new ArrayList<Pond>();
     
     private JComboBox<String> selectType;
+    private JComboBox<String> selectShape;
+    private JComboBox<String> selectSize;
+    
     
     private DrawingPanel theGarden;
     
@@ -153,10 +159,20 @@ public class GardenDesign extends JFrame
     private JPanel createToolBar() {
     	JPanel toolBar = new JPanel();
     	
+    	JLabel labelShape = new JLabel("Shape");
+    	this.selectShape = new JComboBox<String>(new String[] {"Tree", "Pond"});
+    	toolBar.add(labelShape);
+    	toolBar.add(selectShape);
+    	
     	JLabel labelType = new JLabel("Type:");
     	this.selectType = new JComboBox<String>( Tree.getTypes() );
     	toolBar.add(labelType);
     	toolBar.add(selectType);
+    	
+    	JLabel labelSize = new JLabel("Size:");
+    	this.selectSize = new JComboBox<String>( Pond.getSizes() );
+    	toolBar.add(labelSize);
+    	toolBar.add(selectSize);
     	
     	
     	return toolBar;
@@ -165,9 +181,14 @@ public class GardenDesign extends JFrame
     
     public void paintGarden(Graphics g) {
         
+    	for(Pond pond:ponds) {
+        	pond.draw(g);
+        }
+    	
         for(Tree tree:trees) {
         	tree.draw(g);
         }
+        
       
     }
     
@@ -252,9 +273,16 @@ public class GardenDesign extends JFrame
         int x = e.getX();
         int y = e.getY();
         
-        String selectedTreeType = (String) selectType.getSelectedItem();
+        if((String) selectShape.getSelectedItem()=="Tree") {
+        	String selectedTreeType = (String) selectType.getSelectedItem();
+            
+            trees.add(new Tree(x, y, selectedTreeType));
+        }
+        else {
+        	String selectedPondSize = (String) selectSize.getSelectedItem();
+            ponds.add(new Pond(x, y, selectedPondSize));
+        }
         
-        trees.add(new Tree(x, y, selectedTreeType));
         repaint();
         
     }

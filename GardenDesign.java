@@ -9,37 +9,40 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 /**
  * <h1>Garden Designer</h1>
  * 
+ * A simple drawing program.<br />
  * 
+ * Add trees and water features to a layout.<br />
+ * 
+ * Original application can be found <a href="http://www.cs.stir.ac.uk/~sbj/examples/Java-applications/SimpleGardenDesign/">here.</a>
  * 
  * @author Chris Hodgen, Ryan Ritchie
  *
  */
 
 // TODO: Toolbar stacked vertically.
-// 		 Save and load ponds.
 
-
-//http://www.cs.stir.ac.uk/~sbj/examples/Java-applications/SimpleGardenDesign/
 
 public class GardenDesign extends JFrame
-                          implements MouseListener {
+                          implements MouseListener, ActionListener {
 	
 	/* Removed array and replaced with ArrayList object
 		This enables an "endless" amount of trees to be added
 	*/
 	
-    private static final Boolean DEBUG = true;
     private ArrayList<Tree> trees = new ArrayList<Tree>();
     private ArrayList<Pond> ponds = new ArrayList<Pond>();
     
+    
+    // Toolbar elements
     private JComboBox<String> selectType;
     private JComboBox<String> selectShape;
     private JComboBox<String> selectSize;
-    
+    private JLabel labelType;
+    private JLabel labelSize;
     
     private DrawingPanel theGarden;
     
-    JFileChooser fileChooser;
+    private JFileChooser fileChooser;
     
     /**
      * Main method which invokes the class.
@@ -55,26 +58,34 @@ public class GardenDesign extends JFrame
         
     }
     
-    public GardenDesign() {
-    	
-    }
     
     /**
-     * Used to set up the window properties.
+     * Setup look and feel and file chooser settings.
      */
     
-    public void createGUI() {
-    	createMenu();
+    public GardenDesign() {
     	
+    	// Change the JFrame and dialogs to match the system themes, instead of default Java
     	try {
     		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     	} catch(Exception e) {
     		System.out.println("Could not set look and feel.\nError: " + e + "\n");
     	}
     	
-    	this.fileChooser = new JFileChooser();
+    	// Setup behaviour for the file open/save dialog
+        // Only allow for .dat files
+        this.fileChooser = new JFileChooser();
     	fileChooser.setAcceptAllFileFilterUsed(false);
     	fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("Garden Design Files", "dat"));
+    }
+    
+    
+    /**
+     * Set up the window properties.
+     */
+    
+    public void createGUI() {
+    	createMenu();
     	
         setTitle("Garden designer");
         setSize(800,600);
@@ -94,17 +105,17 @@ public class GardenDesign extends JFrame
         theGarden.setBackground(new Color(200,255,200));
         window.add(theGarden, BorderLayout.CENTER);
         
-        window.add(new JLabel("Click to add a tree.", JLabel.CENTER), BorderLayout.SOUTH);
-        
         // Register to be notified of mouse clicks on the drawing panel,
         // and nowhere else in the window. Coordinates will be relative to the panel.
         theGarden.addMouseListener(this);
-      
+        
+        selectShape.addActionListener(this);
+        
     }
     
     
     /**
-     * Used to create the main menu.
+     * Create the main menu.
      */
     
     public void createMenu() {
@@ -151,7 +162,7 @@ public class GardenDesign extends JFrame
     
     
     /**
-     * Used to create the toolbar.
+     * Create the toolbar.
      * @return Instance of JPanel.
      * @see  javax.swing.JPanel
      */
@@ -164,20 +175,49 @@ public class GardenDesign extends JFrame
     	toolBar.add(labelShape);
     	toolBar.add(selectShape);
     	
-    	JLabel labelType = new JLabel("Type:");
+    	this.labelType = new JLabel("Type:");
     	this.selectType = new JComboBox<String>( Tree.getTypes() );
     	toolBar.add(labelType);
     	toolBar.add(selectType);
     	
-    	JLabel labelSize = new JLabel("Size:");
+    	this.labelSize = new JLabel("Size:");
     	this.selectSize = new JComboBox<String>( Pond.getSizes() );
     	toolBar.add(labelSize);
     	toolBar.add(selectSize);
     	
+    	setComboBoxVisibility();
     	
     	return toolBar;
     	
     }
+    
+    
+    /**
+     * Handle visibility of toolbar dropdowns.
+     */
+    
+    private void setComboBoxVisibility() {
+    	if((String) selectShape.getSelectedItem()=="Tree") {
+        	this.selectType.setVisible(true);
+        	this.labelType.setVisible(true);
+        	this.selectSize.setVisible(false);
+        	this.labelSize.setVisible(false);
+        	
+        }
+        else {
+        	this.selectType.setVisible(false);
+        	this.labelType.setVisible(false);
+        	this.selectSize.setVisible(true);
+        	this.labelSize.setVisible(true);
+        }
+           
+    }
+    
+    
+    /**
+     * Redraw the entire garden.
+     * @param Graphics g
+     */
     
     public void paintGarden(Graphics g) {
         
@@ -188,9 +228,8 @@ public class GardenDesign extends JFrame
         for(Tree tree:trees) {
         	tree.draw(g);
         }
-        
-      
     }
+    
     
     /**
      * Clear the current design.
@@ -201,6 +240,7 @@ public class GardenDesign extends JFrame
     	this.ponds = new ArrayList<Pond>();
     	repaint();
     }
+    
     
     /**
      * Save the current garden.
@@ -235,6 +275,7 @@ public class GardenDesign extends JFrame
     	
     }
     
+    
     /**
      * Open a previously saved garden.
      */
@@ -264,10 +305,12 @@ public class GardenDesign extends JFrame
 
         	repaint();
     	}
-    	
-    	
-    	
     }
+    
+    
+    /**
+     * Handle new shape being added.
+     */
     
     public void mousePressed(MouseEvent e) {
     	// Moved this from mouseClicked because it 
@@ -290,6 +333,17 @@ public class GardenDesign extends JFrame
         
     }
     
+    
+    /**
+     * Handle selected shape change
+     */
+    
+    @Override
+	public void actionPerformed(ActionEvent e) {
+		
+		setComboBoxVisibility();
+	}
+    
     public void mouseClicked(MouseEvent e) { }
 
     public void mouseExited(MouseEvent e) { }
@@ -297,6 +351,8 @@ public class GardenDesign extends JFrame
     public void mouseEntered(MouseEvent e) { }
 
     public void mouseReleased(MouseEvent e) { }
+
+	
    
 }
 

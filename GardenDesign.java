@@ -198,6 +198,7 @@ public class GardenDesign extends JFrame
     
     public void newGarden() {
     	this.trees = new ArrayList<Tree>();
+    	this.ponds = new ArrayList<Pond>();
     	repaint();
     }
     
@@ -220,6 +221,7 @@ public class GardenDesign extends JFrame
     			ObjectOutputStream o = new ObjectOutputStream(f);
     	    	
     			o.writeObject(this.trees);
+    			o.writeObject(this.ponds);
     			
     			o.close();
     			f.close();
@@ -247,6 +249,7 @@ public class GardenDesign extends JFrame
     			ObjectInputStream oi = new ObjectInputStream(fi);
     			
     			this.trees = (ArrayList<Tree>) oi.readObject();
+    			this.ponds = (ArrayList<Pond>) oi.readObject();
     			
     			oi.close();
     			fi.close();

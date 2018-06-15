@@ -216,7 +216,7 @@ public class GardenDesign extends JFrame
     
     /**
      * Redraw the entire garden.
-     * @param Graphics g
+     * @param g Graphics object
      */
     
     public void paintGarden(Graphics g) {

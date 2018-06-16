@@ -168,22 +168,38 @@ public class GardenDesign extends JFrame
      */
     
     private JPanel createToolBar() {
-    	JPanel toolBar = new JPanel();
     	
-    	JLabel labelShape = new JLabel("Shape");
+    	JPanel toolBar = new JPanel(new GridBagLayout());
+    	GridBagConstraints c = new GridBagConstraints();
+
+    	JPanel row1 = new JPanel();
+    	JLabel labelShape = new JLabel("Shape:");
+    	row1.add(labelShape);
     	this.selectShape = new JComboBox<String>(new String[] {"Tree", "Pond"});
-    	toolBar.add(labelShape);
-    	toolBar.add(selectShape);
+    	row1.add(selectShape);
     	
+    	JPanel row2 = new JPanel();
+    	row2.setMinimumSize(new Dimension(140,200));
+    	row2.setPreferredSize(new Dimension(140,200));
     	this.labelType = new JLabel("Type:");
+    	row2.add(labelType);
     	this.selectType = new JComboBox<String>( Tree.getTypes() );
-    	toolBar.add(labelType);
-    	toolBar.add(selectType);
+    	row2.add(selectType);
     	
     	this.labelSize = new JLabel("Size:");
+    	row2.add(labelSize);
     	this.selectSize = new JComboBox<String>( Pond.getSizes() );
-    	toolBar.add(labelSize);
-    	toolBar.add(selectSize);
+    	row2.add(selectSize);
+    	
+    	c.anchor = GridBagConstraints.PAGE_START;
+    	c.weighty = 0.0;
+    	c.gridx = 0;
+    	c.gridy = 0;
+    	toolBar.add(row1, c);
+    	
+    	c.weighty = 1;
+    	c.gridy = 1;
+    	toolBar.add(row2, c);
     	
     	setComboBoxVisibility();
     	

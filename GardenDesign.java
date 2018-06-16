@@ -19,8 +19,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  *
  */
 
-// TODO: Toolbar stacked vertically.
-
 
 public class GardenDesign extends JFrame
                           implements MouseListener, ActionListener {
@@ -109,6 +107,8 @@ public class GardenDesign extends JFrame
         // and nowhere else in the window. Coordinates will be relative to the panel.
         theGarden.addMouseListener(this);
         
+        // Register to be notified when the shape dropdown changes
+        // Will update the child dropdown so only the relevant one is shown.
         selectShape.addActionListener(this);
         
     }
@@ -119,6 +119,13 @@ public class GardenDesign extends JFrame
      */
     
     public void createMenu() {
+    	
+    	/* Standard format for adding a menu
+    	   
+    	   Items: New, Open, Save, Exit
+    	 
+    	 */
+    	
     	JMenuBar menuBar = new JMenuBar();
     	
     	JMenu fileMenu = new JMenu("File");
@@ -135,8 +142,6 @@ public class GardenDesign extends JFrame
     	menuItemOpen.addActionListener((ActionEvent event) -> {
     		this.openGarden();
     	});
-    	
-    	//UIManager.getIcon("FileView.floppyDriveIcon")
     	
     	JMenuItem menuItemSave = new JMenuItem("Save", UIManager.getIcon("FileView.floppyDriveIcon"));
     	menuItemSave.setMnemonic(KeyEvent.VK_V);
@@ -169,9 +174,14 @@ public class GardenDesign extends JFrame
     
     private JPanel createToolBar() {
     	
+    	/* Using gridbag layout for extra control over component placement
+    	   The general idea is to add to panels, which will act as rows
+    	   Then each of these rows has the relevant components added
+    	*/
+    	
     	JPanel toolBar = new JPanel(new GridBagLayout());
     	GridBagConstraints c = new GridBagConstraints();
-
+    	
     	JPanel row1 = new JPanel();
     	JLabel labelShape = new JLabel("Shape:");
     	row1.add(labelShape);
@@ -191,6 +201,8 @@ public class GardenDesign extends JFrame
     	this.selectSize = new JComboBox<String>( Pond.getSizes() );
     	row2.add(selectSize);
     	
+    	// Need to set these values so the rows are placed
+    	// at the top of the container panel.
     	c.anchor = GridBagConstraints.PAGE_START;
     	c.weighty = 0.0;
     	c.gridx = 0;
@@ -252,6 +264,10 @@ public class GardenDesign extends JFrame
      */
     
     public void newGarden() {
+    	
+    	// Just blow away the old objects
+    	// and thank garbage collector for cleaning up.
+    	
     	this.trees = new ArrayList<Tree>();
     	this.ponds = new ArrayList<Pond>();
     	repaint();
@@ -263,6 +279,12 @@ public class GardenDesign extends JFrame
      */
     
     public void saveGarden() {
+    	
+    	/* If someone chooses to save:
+    	   - Get the file
+    	   - Check for an extension - add one if necessary
+    	   - Write data to the file
+    	*/
     	
     	if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
     		File file = fileChooser.getSelectedFile();
@@ -297,6 +319,11 @@ public class GardenDesign extends JFrame
      */
     
     public void openGarden() {
+    	
+    	/* Fetch the requested file
+    	   Populate trees and ponds with data from file.
+    	   This must be done in the same order as they were saved
+    	 */
     	
     	if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
     		File file = fileChooser.getSelectedFile();

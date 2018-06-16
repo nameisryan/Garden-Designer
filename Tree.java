@@ -5,30 +5,63 @@ public class Tree implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-    private int x, y;			// The coordinates of the top of the tree
-    private String type;		// Current tree type
+	/**
+	 * The coordinates of the top of the tree
+	 */
+    private int x, y;
+    
+    /**
+     * Current tree type
+     */
+    private String type;
+    
+    /**
+     * Types of available tree
+     */
     private static String[] types = {"Standard",
-    								 "Pine"};	// Types of available tree
-    private Polygon treePoints;	// All the points in the tree's outline
+    								 "Pine"};
+    
+    /**
+     * All the points in the tree's outline
+     */
+    private Polygon treePoints;
    
-    //default tree
+    
+    /**
+     * Specify tree position, set default tree type.
+     * @param x Horizontal position
+     * @param y Vertical position
+     */
     public Tree(int x, int y) {
     	this(x, y, types[0]);
     }
     
+    
+    /**
+     * Specify a type, as well as position.
+     * @param x Horizontal position
+     * @param y Vertical position
+     * @param type String as returned from getTypes()
+     */
     public Tree(int x, int y, String type) {
     	this.x = x;
         this.y = y;
         this.treePoints = getTypePolygon(type);
     	
     }
-   
+    
     public void draw(Graphics g) {
       
         g.setColor(Color.green.darker().darker());
         g.fillPolygon(treePoints);
       
     }
+    
+    /**
+     * Fetch polygon object for given tree type.
+     * @param type String as returned from getTypes()
+     * @return Polygon
+     */
     
     public Polygon getTypePolygon(String type) {
     	Polygon newPolygon;
@@ -52,13 +85,31 @@ public class Tree implements Serializable {
         return newPolygon;
     }
     
+    
+    /**
+     * Fetch tree type of this instance of Tree.
+     * @return String - Type of tree
+     */
+    
     public String getType() {
     	return this.type;
     }
     
+    
+    /**
+     * Set this instance's tree type.
+     * @param type String as returned from getTypes()
+     */
+    
     public void setType(String type) {
     	this.type = type;
     }
+    
+    
+    /**
+     * Fetch all available tree types.
+     * @return String[] - Tree types
+     */
     
     public static String[] getTypes() {
     	return types;
